@@ -1,3 +1,5 @@
+## 🇬🇧 English
+
 # User Catalog App
 
 A simple and responsive user directory built with React and TypeScript, using the DummyJSON API.
@@ -47,6 +49,8 @@ The output will be in the `dist` folder.
 
 
 ---
+
+## 🇷🇺 Русский
 
 # Приложение «Каталог пользователей»
 
