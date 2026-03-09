@@ -1,129 +1,79 @@
-import { BriefcaseBusiness, Mail, Phone } from "lucide-react"
+import { useState, useEffect, useCallback } from 'react';
+import type { User } from './types/user';
+import { fetchUsers, searchUsers } from './services/api';
+import SearchBar from './components/SearchBar';
+import UserList from './components/UserList';
+import Pagination from './components/Pagination';
 
-const App = () => {
+const ITEMS_PER_PAGE = 10;
+
+function App() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [total, setTotal] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+
+  // search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+      setCurrentPage(1); // reset
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const skip = (currentPage - 1) * ITEMS_PER_PAGE;
+      const data = debouncedQuery
+        ? await searchUsers(debouncedQuery, ITEMS_PER_PAGE, skip)
+        : await fetchUsers(ITEMS_PER_PAGE, skip);
+      
+      setUsers(data.users);
+      setTotal(data.total);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, debouncedQuery]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <div className="max-w-6xl mx-auto py-12 min-h-screen">
-      <div className="flex flex-col text-center gap-3">
-        <h1 className="text-3xl font-bold">User Fetching</h1>
-        <span className="text-slate-500">Find users and profiles</span>
-      </div>
-      <div className="flex justify-center px-4 mt-14">
-        <input type="text" placeholder="Search users..." className="border border-slate-300 rounded-md p-2 w-1/3" />
-      </div>
-      {/* convert this to tailwind: grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); */}
-      <div className="grid justify-center grid-cols-[repeat(3,minmax(300px,1fr))] gap-4 mt-8">
-        {/* Card */}
-        <div className="border border-slate-300 rounded-lg shadow p-6">
-          {/* Header */}
-          <div className="flex items-center gap-2">
-            <div className="p-6 border rounded-full">
-              <img src="" alt="" />
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <h2 className="text-[18px] font-bold">User Name</h2>
-              <span className="text-slate-600 text-sm ">@mkkkdi</span>
-            </div>
-          </div>
-          {/* Infos */}
-          <div className="mt-6">
-            <div className="flex items-center gap-2">
-              <Mail size={16}/>
-              <span>Email</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <BriefcaseBusiness size={16}/>
-              <span>Skills</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Phone size={16}/>
-              <span>+998 99 000 99 00</span>
-            </div>
-          </div>
-        </div>
-        <div className="border border-slate-300 rounded-lg shadow p-6">
-          {/* Header */}
-          <div className="flex items-center gap-2">
-            <div className="p-6 border rounded-full">
-              <img src="" alt="" />
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <h2 className="text-[18px] font-bold">User Name</h2>
-              <span className="text-slate-600 text-sm ">@mkkkdi</span>
-            </div>
-          </div>
-          {/* Infos */}
-          <div className="mt-6">
-            <div className="flex items-center gap-2">
-              <Mail size={16}/>
-              <span>Email</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <BriefcaseBusiness size={16}/>
-              <span>Skills</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Phone size={16}/>
-              <span>+998 99 000 99 00</span>
-            </div>
-          </div>
-        </div>
-        <div className="border border-slate-300 rounded-lg shadow p-6">
-          {/* Header */}
-          <div className="flex items-center gap-2">
-            <div className="p-6 border rounded-full">
-              <img src="" alt="" />
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <h2 className="text-[18px] font-bold">User Name</h2>
-              <span className="text-slate-600 text-sm ">@mkkkdi</span>
-            </div>
-          </div>
-          {/* Infos */}
-          <div className="mt-6">
-            <div className="flex items-center gap-2">
-              <Mail size={16}/>
-              <span>Email</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <BriefcaseBusiness size={16}/>
-              <span>Skills</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Phone size={16}/>
-              <span>+998 99 000 99 00</span>
-            </div>
-          </div>
-        </div>
-        <div className="border border-slate-300 rounded-lg shadow p-6">
-          {/* Header */}
-          <div className="flex items-center gap-2">
-            <div className="p-6 border rounded-full">
-              <img src="" alt="" />
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <h2 className="text-[18px] font-bold">User Name</h2>
-              <span className="text-slate-600 text-sm ">@mkkkdi</span>
-            </div>
-          </div>
-          {/* Infos */}
-          <div className="mt-6">
-            <div className="flex items-center gap-2">
-              <Mail size={16}/>
-              <span>Email</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <BriefcaseBusiness size={16}/>
-              <span>Skills</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Phone size={16}/>
-              <span>+998 99 000 99 00</span>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="container max-w-6xl mx-auto">
+      <header className='text-center py-12'>
+        <h1 className='text-3xl font-bold text-slate-800 mb-2'>User Data</h1>
+        <p className='text-slate-600'>Search profile, user from dummy data</p>
+      </header>
+
+      <main className='p-8'>
+        <SearchBar query={searchQuery} onSearch={setSearchQuery} />
+        
+        <UserList users={users} isLoading={isLoading} />
+        
+        {!isLoading && users.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalItems={total}
+            itemsPerPage={ITEMS_PER_PAGE}
+            onPageChange={handlePageChange}
+          />
+        )}
+      </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
